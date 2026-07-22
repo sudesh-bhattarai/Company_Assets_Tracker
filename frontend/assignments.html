@@ -1,1 +1,123 @@
-
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Assignments | Asset Tracker
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body data-page="assignments">
+    <div id="appNav">
+    </div>
+    <main class="container py-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+          <h1 class="h3 mb-1">
+            Assignments
+          </h1>
+          <p class="text-secondary mb-0">
+            Track asset allocation and returns.
+          </p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignmentModal">
+          Assign asset
+        </button>
+      </div>
+      <div id="pageMessage">
+      </div>
+      <div class="card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>
+                  Asset
+                </th>
+                <th>
+                  Employee
+                </th>
+                <th>
+                  Assigned on
+                </th>
+                <th>
+                  Expected return
+                </th>
+                <th>
+                  Status
+                </th>
+                <th class="text-end">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody id="assignmentTable">
+              <tr>
+                <td colspan="6" class="text-center text-secondary p-4">
+                  Loading…
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+    <div class="modal fade" id="assignmentModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="assignmentForm" novalidate>
+            <div class="modal-header">
+              <h2 class="modal-title fs-5">
+                Assign asset
+              </h2>
+              <button class="btn-close" data-bs-dismiss="modal" type="button">
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">
+                  Employee
+                </label>
+                <select class="form-select" id="assignmentEmployee" required>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">
+                  Available asset
+                </label>
+                <select class="form-select" id="assignmentAsset" required>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">
+                  Assignment date
+                </label>
+                <input class="form-control" id="assignmentDate" type="date" required>
+              </div>
+              <div>
+                <label class="form-label">
+                  Expected return date
+                </label>
+                <input class="form-control" id="expectedReturnDate" type="date">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-light" data-bs-dismiss="modal" type="button">
+                Cancel
+              </button>
+              <button class="btn btn-primary" type="submit">
+                Assign asset
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="script.js">
+    </script>
+  </body>
+</html>
