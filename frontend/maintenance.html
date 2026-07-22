@@ -1,1 +1,133 @@
-
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Maintenance | Asset Tracker
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body data-page="maintenance">
+    <div id="appNav">
+    </div>
+    <main class="container py-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+          <h1 class="h3 mb-1">
+            Maintenance
+          </h1>
+          <p class="text-secondary mb-0">
+            Record and follow up maintenance work.
+          </p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
+          Add record
+        </button>
+      </div>
+      <div id="pageMessage">
+      </div>
+      <div class="card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>
+                  Asset
+                </th>
+                <th>
+                  Issue / notes
+                </th>
+                <th>
+                  Scheduled
+                </th>
+                <th>
+                  Completed
+                </th>
+                <th>
+                  Status
+                </th>
+                <th class="text-end">
+                  Update
+                </th>
+              </tr>
+            </thead>
+            <tbody id="maintenanceTable">
+              <tr>
+                <td colspan="6" class="text-center text-secondary p-4">
+                  Loading…
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+    <div class="modal fade" id="maintenanceModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="maintenanceForm" novalidate>
+            <div class="modal-header">
+              <h2 class="modal-title fs-5">
+                Add maintenance record
+              </h2>
+              <button class="btn-close" data-bs-dismiss="modal" type="button">
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">
+                  Asset
+                </label>
+                <select class="form-select" id="maintenanceAsset" required>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">
+                  Issue / notes
+                </label>
+                <textarea class="form-control" id="maintenanceDescription" rows="3" required>
+                </textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">
+                  Scheduled date
+                </label>
+                <input class="form-control" id="maintenanceDate" type="date" required>
+              </div>
+              <div>
+                <label class="form-label">
+                  Status
+                </label>
+                <select class="form-select" id="maintenanceStatus">
+                  <option value="Scheduled">
+                    Scheduled
+                  </option>
+                  <option value="In Progress">
+                    In Progress
+                  </option>
+                  <option value="Completed">
+                    Completed
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-light" data-bs-dismiss="modal" type="button">
+                Cancel
+              </button>
+              <button class="btn btn-primary" type="submit">
+                Save record
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="script.js">
+    </script>
+  </body>
+</html>
