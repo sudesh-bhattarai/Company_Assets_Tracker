@@ -4,10 +4,23 @@ const sendAssetNotFound = (res) => {
   return res.status(404).json({ error: 'Asset not found' });
 };
 
+const getCategoryId = async (category) => {
+  const result = await pool.query(
+    `INSERT INTO asset_categories (category_name)
+     VALUES ($1)
+     ON CONFLICT (category_name)
+     DO UPDATE SET category_name = EXCLUDED.category_name
+     RETURNING category_id`,
+    [category]
+  );
+
+  return result.rows[0].category_id;
+};
+
 exports.getAssets = async (req, res, next) => {
   try {
     const query = `
-      SELECT a.*, c.category_name
+      SELECT a.*, c.category_name AS category, a.condition_description AS condition
       FROM assets a
       INNER JOIN asset_categories c ON a.category_id = c.category_id
       ORDER BY a.asset_id
@@ -23,7 +36,7 @@ exports.getAssets = async (req, res, next) => {
 exports.getAssetById = async (req, res, next) => {
   try {
     const query = `
-      SELECT a.*, c.category_name
+      SELECT a.*, c.category_name AS category, a.condition_description AS condition
       FROM assets a
       INNER JOIN asset_categories c ON a.category_id = c.category_id
       WHERE a.asset_id = $1
@@ -45,14 +58,15 @@ exports.createAsset = async (req, res, next) => {
   const {
     asset_tag,
     asset_name,
-    category_id,
+    category,
     serial_number,
     purchase_date,
     status,
-    condition_description
+    condition
   } = req.body;
 
   try {
+    const categoryId = await getCategoryId(category);
     const query = `
       INSERT INTO assets (
         asset_tag,
@@ -70,11 +84,11 @@ exports.createAsset = async (req, res, next) => {
     const result = await pool.query(query, [
       asset_tag,
       asset_name,
-      category_id,
+      categoryId,
       serial_number,
       purchase_date,
       status,
-      condition_description
+      condition
     ]);
 
     res.status(201).json(result.rows[0]);
@@ -87,14 +101,15 @@ exports.updateAsset = async (req, res, next) => {
   const {
     asset_tag,
     asset_name,
-    category_id,
+    category,
     serial_number,
     purchase_date,
     status,
-    condition_description
+    condition
   } = req.body;
 
   try {
+    const categoryId = await getCategoryId(category);
     const query = `
       UPDATE assets
       SET
@@ -112,11 +127,11 @@ exports.updateAsset = async (req, res, next) => {
     const result = await pool.query(query, [
       asset_tag,
       asset_name,
-      category_id,
+      categoryId,
       serial_number,
       purchase_date,
       status,
-      condition_description,
+      condition,
       req.params.id
     ]);
 
