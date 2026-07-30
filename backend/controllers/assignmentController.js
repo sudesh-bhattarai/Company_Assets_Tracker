@@ -3,7 +3,17 @@ const pool = require('../db');
 exports.getAssignments = async (req, res, next) => {
   try {
     const query = `
-      SELECT aa.*, a.asset_tag, a.asset_name, e.full_name AS employee_name
+      SELECT
+        aa.assignment_id,
+        aa.asset_id,
+        aa.employee_id,
+        aa.assigned_date,
+        aa.expected_return_date,
+        aa.returned_date AS return_date,
+        aa.assignment_status AS status,
+        a.asset_tag,
+        a.asset_name,
+        e.full_name AS employee_name
       FROM asset_assignments aa
       INNER JOIN assets a ON aa.asset_id = a.asset_id
       INNER JOIN employees e ON aa.employee_id = e.employee_id
@@ -18,7 +28,7 @@ exports.getAssignments = async (req, res, next) => {
 };
 
 exports.assignAsset = async (req, res, next) => {
-  const { asset_id, employee_id, assigned_date } = req.body;
+  const { asset_id, employee_id, assigned_date, expected_return_date } = req.body;
   const client = await pool.connect();
 
   try {
@@ -54,16 +64,18 @@ exports.assignAsset = async (req, res, next) => {
         asset_id,
         employee_id,
         assigned_date,
+        expected_return_date,
         assignment_status
       )
-      VALUES ($1, $2, $3, 'Assigned')
+      VALUES ($1, $2, $3, $4, 'Assigned')
       RETURNING *
     `;
 
     const assignmentResult = await client.query(assignmentQuery, [
       asset_id,
       employee_id,
-      assigned_date || new Date().toISOString().slice(0, 10)
+      assigned_date || new Date().toISOString().slice(0, 10),
+      expected_return_date || null
     ]);
 
     await client.query(
@@ -82,7 +94,7 @@ exports.assignAsset = async (req, res, next) => {
 };
 
 exports.returnAsset = async (req, res, next) => {
-  const { returned_date } = req.body;
+  const { return_date } = req.body;
   const client = await pool.connect();
 
   try {
@@ -98,7 +110,7 @@ exports.returnAsset = async (req, res, next) => {
     `;
 
     const assignmentResult = await client.query(returnQuery, [
-      returned_date || new Date().toISOString().slice(0, 10),
+      return_date || new Date().toISOString().slice(0, 10),
       req.params.id
     ]);
 
