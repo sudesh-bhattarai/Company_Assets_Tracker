@@ -4,10 +4,23 @@ const sendEmployeeNotFound = (res) => {
   return res.status(404).json({ error: 'Employee not found' });
 };
 
+const getDepartmentId = async (department) => {
+  const result = await pool.query(
+    `INSERT INTO departments (department_name)
+     VALUES ($1)
+     ON CONFLICT (department_name)
+     DO UPDATE SET department_name = EXCLUDED.department_name
+     RETURNING department_id`,
+    [department]
+  );
+
+  return result.rows[0].department_id;
+};
+
 exports.getEmployees = async (req, res, next) => {
   try {
     const query = `
-      SELECT e.*, d.department_name
+      SELECT e.*, d.department_name AS department
       FROM employees e
       INNER JOIN departments d ON e.department_id = d.department_id
       ORDER BY e.employee_id
@@ -23,7 +36,7 @@ exports.getEmployees = async (req, res, next) => {
 exports.getEmployeeById = async (req, res, next) => {
   try {
     const query = `
-      SELECT e.*, d.department_name
+      SELECT e.*, d.department_name AS department
       FROM employees e
       INNER JOIN departments d ON e.department_id = d.department_id
       WHERE e.employee_id = $1
@@ -42,9 +55,10 @@ exports.getEmployeeById = async (req, res, next) => {
 };
 
 exports.createEmployee = async (req, res, next) => {
-  const { full_name, email, phone, job_title, department_id } = req.body;
+  const { full_name, email, phone, job_title, department } = req.body;
 
   try {
+    const departmentId = await getDepartmentId(department);
     const query = `
       INSERT INTO employees (full_name, email, phone, job_title, department_id)
       VALUES ($1, $2, $3, $4, $5)
@@ -56,7 +70,7 @@ exports.createEmployee = async (req, res, next) => {
       email,
       phone,
       job_title,
-      department_id
+      departmentId
     ]);
 
     res.status(201).json(result.rows[0]);
@@ -66,9 +80,10 @@ exports.createEmployee = async (req, res, next) => {
 };
 
 exports.updateEmployee = async (req, res, next) => {
-  const { full_name, email, phone, job_title, department_id } = req.body;
+  const { full_name, email, phone, job_title, department } = req.body;
 
   try {
+    const departmentId = await getDepartmentId(department);
     const query = `
       UPDATE employees
       SET
@@ -86,7 +101,7 @@ exports.updateEmployee = async (req, res, next) => {
       email,
       phone,
       job_title,
-      department_id,
+      departmentId,
       req.params.id
     ]);
 
