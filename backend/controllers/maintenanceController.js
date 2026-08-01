@@ -3,7 +3,18 @@ const pool = require('../db');
 exports.getMaintenanceRecords = async (req, res, next) => {
   try {
     const query = `
-      SELECT m.*, a.asset_tag, a.asset_name
+      SELECT
+        m.maintenance_id AS id,
+        m.maintenance_id,
+        m.asset_id,
+        m.issue_description AS description,
+        m.maintenance_date AS scheduled_date,
+        m.completion_date AS completed_date,
+        m.maintenance_status AS status,
+        m.cost,
+        m.remarks,
+        a.asset_tag,
+        a.asset_name
       FROM maintenance_records m
       INNER JOIN assets a ON m.asset_id = a.asset_id
       ORDER BY m.maintenance_id DESC
@@ -19,10 +30,9 @@ exports.getMaintenanceRecords = async (req, res, next) => {
 exports.createMaintenanceRecord = async (req, res, next) => {
   const {
     asset_id,
-    issue_description,
-    maintenance_date,
-    completion_date,
-    maintenance_status,
+    description,
+    scheduled_date,
+    status,
     cost,
     remarks
   } = req.body;
@@ -58,10 +68,10 @@ exports.createMaintenanceRecord = async (req, res, next) => {
 
     const values = [
       asset_id,
-      issue_description,
-      maintenance_date || new Date().toISOString().slice(0, 10),
-      completion_date || null,
-      maintenance_status || 'Open',
+      description,
+      scheduled_date || new Date().toISOString().slice(0, 10),
+      null,
+      status || 'Scheduled',
       cost || 0,
       remarks || null
     ];
@@ -69,7 +79,7 @@ exports.createMaintenanceRecord = async (req, res, next) => {
     const recordResult = await client.query(insertQuery, values);
 
     await client.query(
-      "UPDATE assets SET status = 'Under Maintenance' WHERE asset_id = $1",
+      "UPDATE assets SET status = 'Maintenance' WHERE asset_id = $1",
       [asset_id]
     );
 
@@ -84,38 +94,27 @@ exports.createMaintenanceRecord = async (req, res, next) => {
 };
 
 exports.updateMaintenanceRecord = async (req, res, next) => {
-  const {
-    issue_description,
-    maintenance_date,
-    completion_date,
-    maintenance_status,
-    cost,
-    remarks
-  } = req.body;
+  const { status } = req.body;
+  const allowedStatuses = ['Scheduled', 'In Progress', 'Completed'];
+
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Please select a valid maintenance status' });
+  }
 
   try {
     const query = `
       UPDATE maintenance_records
       SET
-        issue_description = $1,
-        maintenance_date = $2,
-        completion_date = $3,
-        maintenance_status = $4,
-        cost = $5,
-        remarks = $6
-      WHERE maintenance_id = $7
+        maintenance_status = $1::VARCHAR,
+        completion_date = CASE
+          WHEN $1::VARCHAR = 'Completed' THEN CURRENT_DATE
+          ELSE NULL
+        END
+      WHERE maintenance_id = $2
       RETURNING *
     `;
 
-    const values = [
-      issue_description,
-      maintenance_date,
-      completion_date || null,
-      maintenance_status,
-      cost,
-      remarks || null,
-      req.params.id
-    ];
+    const values = [status, req.params.id];
 
     const result = await pool.query(query, values);
 
