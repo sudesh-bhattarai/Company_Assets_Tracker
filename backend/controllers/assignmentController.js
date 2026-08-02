@@ -4,6 +4,7 @@ exports.getAssignments = async (req, res, next) => {
   try {
     const query = `
       SELECT
+        aa.assignment_id AS id,
         aa.assignment_id,
         aa.asset_id,
         aa.employee_id,

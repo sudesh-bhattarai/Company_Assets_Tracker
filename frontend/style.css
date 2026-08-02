@@ -15,7 +15,28 @@ body {
 }
 
 .navbar-brand {
+  align-items: center;
+  display: inline-flex;
   font-weight: 700;
+  gap: 0.55rem;
+}
+
+.nav-logo-frame {
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: inline-flex;
+  height: 40px;
+  justify-content: center;
+  overflow: hidden;
+  width: 40px;
+}
+
+.nav-logo {
+  height: 110px;
+  max-width: none;
+  transform: translateY(-18px);
+  width: 110px;
 }
 
 .nav-link.active {
@@ -29,8 +50,41 @@ body {
 }
 
 .stat-card {
-  border-top: 3px solid var(--brand-color);
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  border-top: 4px solid var(--brand-color);
   height: 100%;
+  min-height: 125px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 8px 18px rgba(20, 40, 60, 0.12);
+  transform: translateY(-3px);
+}
+
+.stat-card .card-body {
+  padding: 1.3rem;
+}
+
+.stat-card-total {
+  border-top-color: #1f5f8b;
+}
+
+.stat-card-available {
+  border-top-color: #198754;
+}
+
+.stat-card-assigned {
+  border-top-color: #d99000;
+}
+
+.stat-card-maintenance {
+  border-top-color: #b45a4d;
+}
+
+.stat-card-employees {
+  border-top-color: #6f42c1;
 }
 
 .stat-card span {
@@ -71,4 +125,26 @@ body {
   height: 54px;
   justify-content: center;
   width: 54px;
+}
+
+.logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.dashboard-heading {
+  border-bottom: 1px solid #dce3ea;
+  padding-bottom: 1rem;
+}
+
+.dashboard-panel {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.dashboard-panel .card-header {
+  border-bottom: 1px solid #e5e9ee;
+  padding: 1rem 1.25rem;
 }

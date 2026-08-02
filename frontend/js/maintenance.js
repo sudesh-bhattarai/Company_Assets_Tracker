@@ -14,10 +14,12 @@ async function loadMaintenanceChoices() {
 }
 
 window.updateMaintenance = async (id) => {
-  const status = prompt('New status: Scheduled, In Progress, or Completed');
-  if (!status) return;
-  try { await api(`/maintenance/${id}`, { method: 'PUT', body: JSON.stringify({ status }) }); notify('Maintenance status updated.'); loadMaintenance(); }
-  catch (error) { notify(error.message, 'danger'); }
+  const record = maintenanceRecords.find((item) => String(getId(item)) === String(id));
+  if (!record) return;
+
+  $('#maintenanceUpdateId').value = id;
+  $('#maintenanceUpdateStatus').value = valueFrom(record, 'status') || 'Scheduled';
+  showModal('#maintenanceUpdateModal');
 };
 
 
@@ -41,6 +43,22 @@ function setupMaintenancePage() {
       });
       hideModal('#maintenanceModal');
       notify('Maintenance record added.');
+      loadMaintenance();
+    } catch (error) {
+      notify(error.message, 'danger');
+    }
+  });
+
+  handleFormSubmit($('#maintenanceUpdateForm'), async () => {
+    const id = $('#maintenanceUpdateId').value;
+
+    try {
+      await api(`/maintenance/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: $('#maintenanceUpdateStatus').value })
+      });
+      hideModal('#maintenanceUpdateModal');
+      notify('Maintenance status updated.');
       loadMaintenance();
     } catch (error) {
       notify(error.message, 'danger');

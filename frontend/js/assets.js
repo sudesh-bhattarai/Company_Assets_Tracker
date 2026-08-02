@@ -21,7 +21,14 @@ function assetRows() {
       </td>
       <td>${escapeHtml(valueFrom(asset, 'category'))}</td>
       <td>${escapeHtml(valueFrom(asset, 'serial_number'))}</td>
-      <td>${statusBadge(valueFrom(asset, 'status'))}</td>
+      <td>
+        ${statusBadge(valueFrom(asset, 'status'))}
+        ${valueFrom(asset, 'assigned_employee') ? `
+          <div class="small text-secondary mt-1">
+            Assigned to: ${escapeHtml(valueFrom(asset, 'assigned_employee'))}
+          </div>
+        ` : ''}
+      </td>
       <td>${escapeHtml(valueFrom(asset, 'condition'))}</td>
       <td class="text-end">
         <button class="btn btn-sm btn-outline-primary" onclick="editAsset('${getId(asset)}')">

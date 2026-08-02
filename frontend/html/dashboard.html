@@ -13,7 +13,7 @@
     <div id="appNav">
     </div>
     <main class="container py-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="dashboard-heading d-flex justify-content-between align-items-center mb-4">
         <div>
           <h1 class="h3 mb-1">
             Dashboard
@@ -28,9 +28,9 @@
       </div>
       <div id="pageMessage">
       </div>
-      <div class="row g-3 mb-4">
+      <div class="dashboard-summary row g-3 mb-4">
         <div class="col-sm-6 col-lg">
-          <div class="card stat-card">
+          <div class="card stat-card stat-card-total">
             <div class="card-body">
               <span>
                 Total assets
@@ -42,7 +42,7 @@
           </div>
         </div>
         <div class="col-sm-6 col-lg">
-          <div class="card stat-card">
+          <div class="card stat-card stat-card-available">
             <div class="card-body">
               <span>
                 Available
@@ -54,7 +54,7 @@
           </div>
         </div>
         <div class="col-sm-6 col-lg">
-          <div class="card stat-card">
+          <div class="card stat-card stat-card-assigned">
             <div class="card-body">
               <span>
                 Assigned
@@ -66,7 +66,7 @@
           </div>
         </div>
         <div class="col-sm-6 col-lg">
-          <div class="card stat-card">
+          <div class="card stat-card stat-card-maintenance">
             <div class="card-body">
               <span>
                 Maintenance
@@ -78,7 +78,7 @@
           </div>
         </div>
         <div class="col-sm-6 col-lg">
-          <div class="card stat-card">
+          <div class="card stat-card stat-card-employees">
             <div class="card-body">
               <span>
                 Employees
@@ -92,7 +92,7 @@
       </div>
       <div class="row g-4">
         <div class="col-lg-7">
-          <section class="card">
+          <section class="card dashboard-panel">
             <div class="card-header bg-white">
               <h2 class="h6 mb-0">
                 Recent assets
@@ -128,7 +128,7 @@
           </section>
         </div>
         <div class="col-lg-5">
-          <section class="card">
+          <section class="card dashboard-panel">
             <div class="card-header bg-white">
               <h2 class="h6 mb-0">
                 Recent assignments

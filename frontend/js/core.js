@@ -99,7 +99,12 @@ function navigation() {
   $('#appNav').innerHTML = `
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container">
-        <a class="navbar-brand" href="dashboard.html">Asset Tracker</a>
+        <a class="navbar-brand" href="dashboard.html">
+          <span class="nav-logo-frame">
+            <img class="nav-logo" src="../assets/logo/project-logo.jpeg" alt="Company Asset Tracker logo">
+          </span>
+          <span>Asset Tracker</span>
+        </a>
         <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navLinks">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -107,9 +112,10 @@ function navigation() {
           <ul class="navbar-nav me-auto">
             ${pages.map(([key, name]) => `<li class="nav-item"><a class="nav-link ${page === key ? 'active' : ''}" href="${key}.html">${name}</a></li>`).join('')}
           </ul>
-          <a class="btn btn-outline-light btn-sm" href="index.html">Sign out</a>
+          <a class="btn btn-outline-light btn-sm" href="index.html" id="signOut">Sign out</a>
         </div>
       </div>
     </nav>`;
+  $('#signOut').onclick = () => sessionStorage.removeItem('assetTrackerUser');
 }
 
