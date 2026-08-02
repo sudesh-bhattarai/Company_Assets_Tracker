@@ -17,12 +17,41 @@ const getCategoryId = async (category) => {
   return result.rows[0].category_id;
 };
 
+const createMaintenanceRecordIfNeeded = async (assetId) => {
+  const activeRecord = await pool.query(
+    `SELECT maintenance_id
+     FROM maintenance_records
+     WHERE asset_id = $1
+       AND maintenance_status IN ('Scheduled', 'In Progress')`,
+    [assetId]
+  );
+
+  if (!activeRecord.rowCount) {
+    await pool.query(
+      `INSERT INTO maintenance_records (
+        asset_id,
+        issue_description,
+        maintenance_status
+      )
+      VALUES ($1, $2, 'Scheduled')`,
+      [assetId, 'Asset marked for maintenance from the Assets page']
+    );
+  }
+};
+
 exports.getAssets = async (req, res, next) => {
   try {
     const query = `
-      SELECT a.*, c.category_name AS category, a.condition_description AS condition
+      SELECT
+        a.*,
+        c.category_name AS category,
+        a.condition_description AS condition,
+        e.full_name AS assigned_employee
       FROM assets a
       INNER JOIN asset_categories c ON a.category_id = c.category_id
+      LEFT JOIN asset_assignments aa
+        ON a.asset_id = aa.asset_id AND aa.assignment_status = 'Assigned'
+      LEFT JOIN employees e ON aa.employee_id = e.employee_id
       ORDER BY a.asset_id
     `;
 
@@ -36,9 +65,16 @@ exports.getAssets = async (req, res, next) => {
 exports.getAssetById = async (req, res, next) => {
   try {
     const query = `
-      SELECT a.*, c.category_name AS category, a.condition_description AS condition
+      SELECT
+        a.*,
+        c.category_name AS category,
+        a.condition_description AS condition,
+        e.full_name AS assigned_employee
       FROM assets a
       INNER JOIN asset_categories c ON a.category_id = c.category_id
+      LEFT JOIN asset_assignments aa
+        ON a.asset_id = aa.asset_id AND aa.assignment_status = 'Assigned'
+      LEFT JOIN employees e ON aa.employee_id = e.employee_id
       WHERE a.asset_id = $1
     `;
 
@@ -66,6 +102,12 @@ exports.createAsset = async (req, res, next) => {
   } = req.body;
 
   try {
+    if (status === 'Assigned') {
+      return res.status(400).json({
+        error: 'Use the Assignments page to assign an asset to an employee'
+      });
+    }
+
     const categoryId = await getCategoryId(category);
     const query = `
       INSERT INTO assets (
@@ -91,6 +133,10 @@ exports.createAsset = async (req, res, next) => {
       condition
     ]);
 
+    if (status === 'Maintenance') {
+      await createMaintenanceRecordIfNeeded(result.rows[0].asset_id);
+    }
+
     res.status(201).json(result.rows[0]);
   } catch (error) {
     next(error);
@@ -109,6 +155,21 @@ exports.updateAsset = async (req, res, next) => {
   } = req.body;
 
   try {
+    if (status === 'Assigned') {
+      const activeAssignment = await pool.query(
+        `SELECT assignment_id
+         FROM asset_assignments
+         WHERE asset_id = $1 AND assignment_status = 'Assigned'`,
+        [req.params.id]
+      );
+
+      if (!activeAssignment.rowCount) {
+        return res.status(400).json({
+          error: 'Use the Assignments page to assign an asset to an employee'
+        });
+      }
+    }
+
     const categoryId = await getCategoryId(category);
     const query = `
       UPDATE assets
@@ -137,6 +198,10 @@ exports.updateAsset = async (req, res, next) => {
 
     if (!result.rowCount) {
       return sendAssetNotFound(res);
+    }
+
+    if (status === 'Maintenance') {
+      await createMaintenanceRecordIfNeeded(result.rows[0].asset_id);
     }
 
     res.json(result.rows[0]);
