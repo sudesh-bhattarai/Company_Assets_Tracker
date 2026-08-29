@@ -1,5 +1,7 @@
-/* Uses the same domain as the Express server in both local and deployed environments. */
-const API_BASE_URL = '/api';
+/* Uses the local Express server during development and Render after Vercel deployment. */
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/api'
+  : 'https://company-assets-tracker.onrender.com/api';
 
 let employees = [];
 let assets = [];
