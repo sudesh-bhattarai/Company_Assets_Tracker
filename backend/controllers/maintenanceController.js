@@ -101,7 +101,11 @@ exports.updateMaintenanceRecord = async (req, res, next) => {
     return res.status(400).json({ error: 'Please select a valid maintenance status' });
   }
 
+  const client = await pool.connect();
+
   try {
+    await client.query('BEGIN');
+
     const query = `
       UPDATE maintenance_records
       SET
@@ -116,14 +120,27 @@ exports.updateMaintenanceRecord = async (req, res, next) => {
 
     const values = [status, req.params.id];
 
-    const result = await pool.query(query, values);
+    const result = await client.query(query, values);
 
     if (!result.rowCount) {
+      await client.query('ROLLBACK');
       return res.status(404).json({ error: 'Maintenance record not found' });
     }
 
+    if (status === 'Completed') {
+      await client.query(
+        "UPDATE assets SET status = 'Available' WHERE asset_id = $1",
+        [result.rows[0].asset_id]
+      );
+    }
+
+    await client.query('COMMIT');
+
     res.json(result.rows[0]);
   } catch (error) {
+    await client.query('ROLLBACK');
     next(error);
+  } finally {
+    client.release();
   }
 };

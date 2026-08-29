@@ -1,4 +1,4 @@
-# Company Asset Tracker
+# Company Assets Tracker
 
 A web-based asset management system developed as a DBMS mini-project.
 
