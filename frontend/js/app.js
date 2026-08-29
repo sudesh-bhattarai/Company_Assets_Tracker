@@ -18,6 +18,20 @@ function setupLoginPage() {
   $('#showLogin').onclick = () => showAuthForm('login');
   $('#showSignup').onclick = () => showAuthForm('signup');
 
+  $('#tryDemo').onclick = async () => {
+    showAuthForm('login');
+    $('#loginEmail').value = 'demo@companyassettracker.com';
+    $('#loginPassword').value = 'Demo@123';
+
+    try {
+      const result = await api('/auth/demo', { method: 'POST' });
+      saveLoggedInUser(result.user);
+      window.location.href = 'dashboard.html';
+    } catch (error) {
+      notify(error.message, 'danger');
+    }
+  };
+
   $('#loginForm').onsubmit = async (event) => {
     event.preventDefault();
 

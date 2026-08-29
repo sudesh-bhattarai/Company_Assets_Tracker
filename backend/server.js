@@ -13,6 +13,8 @@ const assetController = require('./controllers/assetController');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const DEMO_EMAIL = 'demo@companyassettracker.com';
+const DEMO_PASSWORD = 'Demo@123';
 
 app.use(express.json());
 app.use(cors());
@@ -84,6 +86,28 @@ app.post('/api/auth/login', async (req, res, next) => {
     res.json({
       message: 'Login successful',
       user: { user_id: user.user_id, email: user.email }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// This public account gives visitors access to a safe demonstration of the project.
+app.post('/api/auth/demo', async (req, res, next) => {
+  try {
+    const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
+    const result = await pool.query(
+      `INSERT INTO users (email, password_hash)
+       VALUES ($1, $2)
+       ON CONFLICT (email)
+       DO UPDATE SET password_hash = EXCLUDED.password_hash
+       RETURNING user_id, email`,
+      [DEMO_EMAIL, passwordHash]
+    );
+
+    res.json({
+      message: 'Demo access granted',
+      user: result.rows[0]
     });
   } catch (error) {
     next(error);

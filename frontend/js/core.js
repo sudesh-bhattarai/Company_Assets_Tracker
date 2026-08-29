@@ -1,5 +1,5 @@
-/* Update this value when the Express API runs on a different port. */
-const API_BASE_URL = 'http://localhost:5000/api';
+/* Uses the same domain as the Express server in both local and deployed environments. */
+const API_BASE_URL = '/api';
 
 let employees = [];
 let assets = [];
